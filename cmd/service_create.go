@@ -307,19 +307,17 @@ func createService(operation *ServiceCreateOperation) {
 		operation.Image = repository.UriFor(tag)
 	}
 
-	if !operation.Port.Empty() {
+	if operation.LoadBalancerArn != "" {
 		vpcId := ec2.GetSubnetVpcId(operation.SubnetIds[0])
 		targetGroupArn = elbv2.CreateTargetGroup(
 			&ELBV2.CreateTargetGroupInput{
-				Name:     operation.LoadBalancerName + "-" + operation.ServiceName,
+				Name:     fmt.Sprintf("%s-%s", clusterName, operation.ServiceName),
 				Port:     operation.Port.Port,
 				Protocol: operation.Port.Protocol,
 				VpcId:    vpcId,
 			},
 		)
-	}
 
-	if operation.LoadBalancerArn != "" {
 		if len(operation.Rules) > 0 {
 			for _, rule := range operation.Rules {
 				elbv2.AddRule(operation.LoadBalancerArn, targetGroupArn, rule)

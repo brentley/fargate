@@ -3,6 +3,8 @@
 ### Bug Fixes
 
 - service create will not run if a load balancer is configured without a port.
+- service create and task run will no longer create a repository if an image is
+  explictly passed.
 
 ## 0.2.0 (2017-12-31)
 

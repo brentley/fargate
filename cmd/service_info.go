@@ -66,33 +66,34 @@ func getServiceInfo(operation *ServiceInfoOperation) {
 	console.KeyValue("Security Groups", "%s\n", strings.Join(service.SecurityGroupIds, ", "))
 
 	if service.TargetGroupArn != "" {
-		loadBalancerArn := elbv2.GetTargetGroupLoadBalancerArn(service.TargetGroupArn)
-		loadBalancer := elbv2.DescribeLoadBalancerByArn(loadBalancerArn)
-		listeners := elbv2.GetListeners(loadBalancerArn)
+		if loadBalancerArn := elbv2.GetTargetGroupLoadBalancerArn(service.TargetGroupArn); loadBalancerArn != "" {
+			loadBalancer := elbv2.DescribeLoadBalancerByArn(loadBalancerArn)
+			listeners := elbv2.GetListeners(loadBalancerArn)
 
-		console.KeyValue("Load Balancer", "\n")
-		console.KeyValue("  Name", "%s\n", loadBalancer.Name)
-		console.KeyValue("  DNS Name", "%s\n", loadBalancer.DNSName)
+			console.KeyValue("Load Balancer", "\n")
+			console.KeyValue("  Name", "%s\n", loadBalancer.Name)
+			console.KeyValue("  DNS Name", "%s\n", loadBalancer.DNSName)
 
-		if len(listeners) > 0 {
-			console.KeyValue("  Listeners", "\n")
-		}
-
-		for _, listener := range listeners {
-			var ruleOutput []string
-
-			for _, rule := range elbv2.DescribeRules(listener.Arn) {
-				if rule.TargetGroupArn == service.TargetGroupArn {
-					ruleOutput = append(ruleOutput, rule.String())
-				}
+			if len(listeners) > 0 {
+				console.KeyValue("  Listeners", "\n")
 			}
 
-			console.KeyValue("    "+listener.String(), "\n")
-			console.KeyValue("      Rules", "%s\n", strings.Join(ruleOutput, ", "))
+			for _, listener := range listeners {
+				var ruleOutput []string
 
-			if len(listener.CertificateArns) > 0 {
-				certificateDomains := acm.ListCertificateDomainNames(listener.CertificateArns)
-				console.KeyValue("      Certificates", "%s\n", strings.Join(certificateDomains, ", "))
+				for _, rule := range elbv2.DescribeRules(listener.Arn) {
+					if rule.TargetGroupArn == service.TargetGroupArn {
+						ruleOutput = append(ruleOutput, rule.String())
+					}
+				}
+
+				console.KeyValue("    "+listener.String(), "\n")
+				console.KeyValue("      Rules", "%s\n", strings.Join(ruleOutput, ", "))
+
+				if len(listener.CertificateArns) > 0 {
+					certificateDomains := acm.ListCertificateDomainNames(listener.CertificateArns)
+					console.KeyValue("      Certificates", "%s\n", strings.Join(certificateDomains, ", "))
+				}
 			}
 		}
 

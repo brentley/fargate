@@ -23,6 +23,8 @@ type Rule struct {
 	Value          string
 	TargetGroupArn string
 	Priority       string
+	Arn            string
+	IsDefault      bool
 }
 
 func (r *Rule) String() string {
@@ -167,10 +169,11 @@ func (elbv2 *ELBV2) DescribeRules(listenerArn string) []Rule {
 
 			for _, v := range c.Values {
 				rule := Rule{
+					Arn:            aws.StringValue(r.RuleArn),
+					Priority:       aws.StringValue(r.Priority),
 					TargetGroupArn: aws.StringValue(r.Actions[0].TargetGroupArn),
 					Type:           field,
 					Value:          aws.StringValue(v),
-					Priority:       aws.StringValue(r.Priority),
 				}
 
 				rules = append(rules, rule)
@@ -181,6 +184,7 @@ func (elbv2 *ELBV2) DescribeRules(listenerArn string) []Rule {
 			rule := Rule{
 				TargetGroupArn: aws.StringValue(r.Actions[0].TargetGroupArn),
 				Type:           "DEFAULT",
+				IsDefault:      true,
 			}
 
 			rules = append(rules, rule)
@@ -249,4 +253,16 @@ func (elbv2 *ELBV2) GetListeners(lbArn string) []Listener {
 	}
 
 	return listeners
+}
+
+func (elbv2 *ELBV2) DeleteRule(ruleArn string) {
+	_, err := elbv2.svc.DeleteRule(
+		&awselbv2.DeleteRuleInput{
+			RuleArn: aws.String(ruleArn),
+		},
+	)
+
+	if err != nil {
+		console.ErrorExit(err, "Could not delete ELB rule")
+	}
 }

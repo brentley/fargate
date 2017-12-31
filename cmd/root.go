@@ -60,6 +60,10 @@ func (p *Port) Empty() bool {
 	return p.Port == 0 && p.Protocol == ""
 }
 
+func (p *Port) String() string {
+	return fmt.Sprintf("%s:%d", p.Protocol, p.Port)
+}
+
 var rootCmd = &cobra.Command{
 	Use:   "fargate",
 	Short: "Deploy serverless containers onto the cloud from your command line",

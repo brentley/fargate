@@ -1,3 +1,9 @@
+## 0.3.0 (In Progress)
+
+### Bug Fixes
+
+- service create will not run if a load balancer is configured without a port.
+
 ## 0.2.0 (2017-12-31)
 
 ### Features

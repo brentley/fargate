@@ -56,6 +56,10 @@ type Port struct {
 	Protocol string
 }
 
+func (p *Port) Empty() bool {
+	return p.Port == 0 && p.Protocol == ""
+}
+
 var rootCmd = &cobra.Command{
 	Use:   "fargate",
 	Short: "Deploy serverless containers onto the cloud from your command line",

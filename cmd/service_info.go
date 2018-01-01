@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"sort"
 	"strings"
 	"text/tabwriter"
 
@@ -81,7 +82,11 @@ func getServiceInfo(operation *ServiceInfoOperation) {
 			for _, listener := range listeners {
 				var ruleOutput []string
 
-				for _, rule := range elbv2.DescribeRules(listener.Arn) {
+				rules := elbv2.DescribeRules(listener.Arn)
+
+				sort.Slice(rules, func(i, j int) bool { return rules[i].Priority > rules[j].Priority })
+
+				for _, rule := range rules {
 					if rule.TargetGroupArn == service.TargetGroupArn {
 						ruleOutput = append(ruleOutput, rule.String())
 					}

@@ -17,10 +17,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const (
-	typeService           = "service"
-	validRuleTypesPattern = "(?i)^host|path$"
-)
+const typeService = "service"
 
 type ServiceCreateOperation struct {
 	Cpu              string

@@ -28,6 +28,7 @@ const (
 	protocolTcp           string = "TCP"
 	mebibytesInGibibyte   int64  = 1024
 	validProtocolsPattern string = "(?i)\\ATCP|HTTP(S)?\\z"
+	validRuleTypesPattern string = "(?i)^host|path$"
 )
 
 var InvalidCpuAndMemoryCombination = fmt.Errorf(`Invalid CPU and Memory settings
